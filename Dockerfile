@@ -31,6 +31,8 @@ WORKDIR /etc/satosa
 
 # Preload bespoke ENV configurable config
 COPY *.yaml /etc/satosa
+# Preload dummy XML metadata
+COPY dummy-metadata.xml /etc/satosa
 
 # Add an entrypoint so we can use ENV for gunicorn args
 ENV LOG_LEVEL="info"
