@@ -25,20 +25,20 @@ LOGGING:
     stdout:
       class: logging.StreamHandler
       stream: "ext://sys.stdout"
-      level: DEBUG
+      level: !ENV LOG_LEVEL
       formatter: simple
   loggers:
     satosa:
-      level: DEBUG
+      level: !ENV LOG_LEVEL
     saml2:
-      level: DEBUG
+      level: !ENV LOG_LEVEL
     oidcendpoint:
-      level: DEBUG
+      level: !ENV LOG_LEVEL
     pyop:
-      level: DEBUG
+      level: !ENV LOG_LEVEL
     oic:
-      level: DEBUG
+      level: !ENV LOG_LEVEL
   root:
-    level: DEBUG
+    level: !ENV LOG_LEVEL
     handlers:
       - stdout

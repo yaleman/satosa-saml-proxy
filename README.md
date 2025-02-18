@@ -7,9 +7,8 @@ i.e. How to connect legacy web apps that only support SAML to be backed by Kanid
 > The intent is to morph into a "v2" that allows a dynamic mapping of multiple systems to multiple OIDC endpoints via a single SAML proxy. The simpler version will be preserved for educational purposes but is intended to become "legacy".
 
 ## TODO items on the roadmap
-1. Add log level configuration via ENV. It's now hardcoded to debug.
-2. Rewrite env config & the SATOSA configs for dynamic routing so that multiple apps can be routed to different OIDC clients. In the meanwhile you can configure multiple apps to use the same proxy, but then you can't control via claim maps on the Kanidm side who is eligible for what app.
-3. Get rid of the idpyoidc PR fork use once they no longer force RS256.
+1. Get rid of the idpyoidc git build once there's a release that contains ES256 support.
+2. Get rid of any manual jiggery with idpyoidc once SATOSA requires a sufficiently high version to support ES256.
 
 ## The container
 
@@ -18,6 +17,12 @@ The container built at `ghcr.io/jinnatar/satosa-saml-proxy:latest` is a proof of
 The caveats with the container and/or trying to go without it:
 - While recent releases of SATOSA support PKCE, they depend on the Python library `idpyoidc` for this. Unfortunately it has an issue that prevents using ES256 for signing with released versions. The container thus uses [a branch from git](https://github.com/IdentityPython/idpy-oidc/tree/issuer_metadata) that contains the fix for this. Once a full release is made with said fix that will be used specifically. Once SATOSA requires a high enough release of `idpyoidc` that contains a fix, we can stop with this nonsense altogether.
 - The containers are now version tagged as per SATOSA upstream versions. However, due to the above nonsense those tags will be updated later when better build provenance is available.
+
+### Container config options
+The container contains minimal config options via environment variables for ease of use.
+- `LOG_LEVEL`: defaults to `info`. You may want to raise this to `debug` for troubleshooting, but be aware logs will then leak tokens. Affects gunicorn and all SATOSA modules (if using the env based default config).
+- `LISTEN_ADDR`: defaults to `0.0.0.0:80`. You may need to alter this depending on your container orchestration and proxying needs.
+- Any other gunicorn flags can be passed as arguments.
 
 ## Step by step guides for usage
 
@@ -34,6 +39,7 @@ SAML is a bit *involved* so we need to prep a persistent certificate and provide
 1. Once you have your metadata XML file, make it available to your container, for example via a volume. The dummy data is already available.
 2. Configure the ENV variables that will tweak the provided SATOSA configs. You can edit the provided `example.env` file and feed it to Docker via the `--env-file` flag. Make sure to **not** quote values if using that flag. Explanations below:
    ```shell
+   LOG_LEVEL=debug  # Enables debug logging for troubleshooting. Change this to "info" when everything works!
    ENCRYPTION_KEY=0xDEADBEEF  # Key used to encrypt state in transit. Could generate with `openssl rand -base64 32`  
    OIDC_CLIENT_ID=your-client-id  # The OIDC client id in Kanidm is the name of the integration, for example `ceph`  
    OIDC_CLIENT_SECRET=your-oidc-client-secret  
@@ -71,6 +77,7 @@ SAML is a bit *involved* so we need to prep a persistent certificate and provide
 1. We can't get Ceph to spit out it's metadata XML before the proxy is functioning so we skip ahead.
 1. Config your ENV variables into a new env file, `ceph.env`. If you don't change the ENCRYPTION_KEY value you deserve everything you get as a result.
    ```shell
+   LOG_LEVEL=debug  # Enables debug logging for troubleshooting. Change this to "info" when everything works!
    ENCRYPTION_KEY=+OSDGTYdWxesiUwcMEzaGzwCx81YHhzOFgsitMn9A/c=
    OIDC_CLIENT_ID=ceph
    OIDC_CLIENT_SECRET=# You got this above from kanidm

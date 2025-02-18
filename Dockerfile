@@ -32,7 +32,11 @@ WORKDIR /etc/satosa
 # Preload bespoke ENV configurable config
 COPY *.yaml /etc/satosa
 
-ENTRYPOINT ["gunicorn"]
+# Add an entrypoint so we can use ENV for gunicorn args
+ENV LOG_LEVEL="info"
+ENV LISTEN_ADDR="0.0.0.0:80"
+COPY entrypoint.sh /entrypoint.sh
+ENTRYPOINT ["/entrypoint.sh"]
+
 EXPOSE 80
 USER satosa:satosa
-CMD ["-b0.0.0.0:80","satosa.wsgi:app"]
