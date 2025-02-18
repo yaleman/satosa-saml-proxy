@@ -16,9 +16,8 @@ i.e. How to connect legacy web apps that only support SAML to be backed by Kanid
 The container built at `ghcr.io/jinnatar/satosa-saml-proxy:latest` is a proof of concept using the SATOSA configs in the repo. The guides below will assume you are using it, but nothing prevents you from using the same configs and ENV config with any other supported SATOSA installation method. I am using the container myself in my environment and have a vested interest in keeping it going and tested.
 
 The caveats with the container and/or trying to go without it:
-- The currently released version of SATOSA, 8.4.0 is over a year old and does not include their new and improved OIDC module. The better module is required for PKCE support, which is why the container is built from their git HEAD instead of a release.
-- The main dependency for their new OIDC module is idpy-oidc. Unfortunately it has an issue that prevents using ES256 for signing. The container has a patch that instead enforces ES256, but it's unsuitable to upstream as a proper fix. This patching will be removed once https://github.com/IdentityPython/idpy-oidc/issues/110 is resolved. You could use `ES256.patch` to replicate this bubblegum fix outside the container.
-- The containers are not version tagged, since there is no upstream version of SATOSA that fulfills the requirements. They are however tagged to specific commits for your convenience if you do not wish to follow `:latest`.
+- While recent releases of SATOSA support PKCE, they depend on the Python library `idpyoidc` for this. Unfortunately it has an issue that prevents using ES256 for signing with released versions. The container thus uses [a branch from git](https://github.com/IdentityPython/idpy-oidc/tree/issuer_metadata) that contains the fix for this. Once a full release is made with said fix that will be used specifically. Once SATOSA requires a high enough release of `idpyoidc` that contains a fix, we can stop with this nonsense altogether.
+- The containers are now version tagged as per SATOSA upstream versions. However, due to the above nonsense those tags will be updated later when better build provenance is available.
 
 ## Step by step guides for usage
 
