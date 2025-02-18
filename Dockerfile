@@ -35,7 +35,7 @@ COPY *.yaml /etc/satosa
 COPY dummy-metadata.xml /etc/satosa
 
 # Add an entrypoint so we can use ENV for gunicorn args
-ENV LOG_LEVEL="info"
+ENV LOG_LEVEL="INFO"
 ENV LISTEN_ADDR="0.0.0.0:80"
 COPY entrypoint.sh /entrypoint.sh
 ENTRYPOINT ["/entrypoint.sh"]
