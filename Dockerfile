@@ -18,7 +18,8 @@ RUN set -eux; \
 		jq \
 		libxml2-utils \
 		xmlsec \
-    git  # Only needed until we have a non-git idpyoidc ref
+    git
+# ^ Only needed until we have a non-git idpyoidc ref
 
 
 RUN pip install --no-cache-dir \
@@ -38,7 +39,8 @@ COPY dummy-metadata.xml /etc/satosa
 ENV LOG_LEVEL="INFO"
 ENV LISTEN_ADDR="0.0.0.0:80"
 COPY entrypoint.sh /entrypoint.sh
-ENTRYPOINT ["/entrypoint.sh"]
 
 EXPOSE 80
 USER satosa:satosa
+
+ENTRYPOINT ["/entrypoint.sh"]
