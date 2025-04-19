@@ -39,8 +39,7 @@ COPY dummy-metadata.xml /etc/satosa
 ENV LOG_LEVEL="INFO"
 ENV LISTEN_ADDR="0.0.0.0:80"
 COPY entrypoint.sh /entrypoint.sh
+ENTRYPOINT ["/entrypoint.sh"]
 
 EXPOSE 80
 USER satosa:satosa
-
-ENTRYPOINT ["/entrypoint.sh"]
